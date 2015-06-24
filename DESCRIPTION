@@ -1,0 +1,18 @@
+Package: qsaParBoot
+Type: Package
+Title: Model Validation using Quantile Spectral Analysis and Parametric
+    Bootstrap
+Version: 0.1
+Date: 2015-06-24
+Authors@R: person("Stefan", "Birr", role=c("aut","cre"),email = "stefan.birr@ruhr-uni-bochum.de")
+Imports:
+    quantspec,
+    stats
+Description: Provides functionality for Model Validation by computing a
+    parametric Bootstrap and comparing the Quantile Spectral densitiys.
+License: GPL (>=2)
+LazyData: TRUE
+Collate:
+    'Models.R'
+    'Main.R'
+    'qsaParBoot-package.R'
