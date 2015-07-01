@@ -1,4 +1,4 @@
-#' @include qsaParBoot-package.R
+#' @include QPBoot-package.R
 NULL
 
 ################################################################################
@@ -7,8 +7,8 @@ NULL
 #' Methods to validate model assumptions by using Quantile Spectral Analysis and
 #' Paramtric Bootstraps
 #'
-#' @name qsaParBoot-package
-#' @aliases qsaParBoot
+#' @name QPBoot-package
+#' @aliases QPBoot
 #' @docType package
 #' @author Stefan Birr
 #'
