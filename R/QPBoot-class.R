@@ -64,7 +64,7 @@ setMethod(
 setMethod(f = "getCIs",
           signature = signature(
             object = "QPBoot"),
-          definition = function(object,alpha = 0.05){
+          definition = function(object,alpha = 0.05,method = c("quantiles","norm")){
             #Extract Values
             ln = length(getLevels(object@sPG)[[1]])
             freq = getFrequencies(object@sPGsim[[1]])
@@ -87,14 +87,25 @@ setMethod(f = "getCIs",
             }
             }
 
+            method <- match.arg(method)[1]
+            switch(method,
+                   "quantiles" = {
+                     #Compute Quantiles
+                     q_low = rep(0,length(freq))
+                     q_up = rep(0,length(freq))
+                     
+                     q_low = apply(SimValues,c(2,3,4),alphaq(alpha/2))
+                     q_up = apply(SimValues,c(2,3,4),alphaq(1-alpha/2))
+                     },
+                   "norm" = {
+                     #Estimate mean and variance
+                     mean = apply(SimValues,c(2,3,4),mean)
+                     sd  = apply(SimValues,c(2,3,4),sd)
+                     q_low = qnorm(alpha/2,mean = mean, sd = sd)
+                     q_up = qnorm(1-alpha/2,mean = mean, sd = sd)
+                   }
+            )
             
-            #Compute Quantiles
-            q_low = rep(0,length(freq))
-            q_up = rep(0,length(freq))
-
-            q_low = apply(SimValues,c(2,3,4),alphaq(alpha))
-            q_up = apply(SimValues,c(2,3,4),alphaq(1-alpha))
-
             #Return:
             return(list(q_low = q_low,q_up = q_up))
           }
@@ -118,7 +129,6 @@ setMethod(f = "getCIs",
 #' @keywords Constructors
 #'
 #' @param data
-#' @param alpha
 #' @param model
 #' @param levels
 #' @param weight
@@ -127,7 +137,7 @@ setMethod(f = "getCIs",
 #'
 ################################################################################
 
-qpBoot <- function(data,alpha = 0.05,model = getAR(2),levels = c(.25,.5,.75),weight = kernelWeight(bw = 0.025),SimNum = 1000){
+qpBoot <- function(data,model = getAR(2),levels = c(.25,.5,.75),weight = kernelWeight(bw = 0.1*length(data)^(-1/5)),SimNum = 1000,trueparam = NULL){
 # Set
 ln = length(levels)
 n = length(data)
@@ -136,16 +146,23 @@ n = length(data)
 sPG = smoothedPG(data,levels.1 = levels,weight = weight)
 
 # Estimate the parametric model and Simulate from there
+if (is.null(trueparam)){
 param = model$estimator(data)
-#param = c(.6,.2)   #use true parameter
+}else{
+  param = as.numeric(trueparam)
+}
+#param =c(.1,.8,0)  #use true parameter
 
 sPGsim = list()
 S = array(rep(0,SimNum*length(data)),dim = c(SimNum,length(data)))
 #Simulate SimNum times
+pb = txtProgressBar()
 for (i in 1:SimNum){
+  setTxtProgressBar(pb,i/SimNum)
   S[i,] = model$simulate(param,length(data))
   sPGsim[[i]] = smoothedPG(S[i,],levels.1 = levels,weight = weight)
 }
+close(pb)
 obj <- new("QPBoot",as.numeric(data),sPG,model,sPGsim,param)
 return(obj)
 }
@@ -205,7 +222,7 @@ return(obj)
 
 setMethod(f = "plot",
           signature = signature("QPBoot"),
-          definition = function(x, ptw.CIs = 0.1, ratio = 3/2, widthlab = lcm(1), xlab = expression(omega/2*pi), ylab = NULL,
+          definition = function(x, ptw.CIs = 0.1,method = "quantiles", ratio = 3/2, widthlab = lcm(1), xlab = expression(omega/2*pi), ylab = NULL,
                                 type.scaling = c("individual", "real-imaginary", "all"),
                                 frequencies=x@sPG@frequencies,
                                 levels=intersect(x@sPG@levels[[1]], x@sPG@levels[[2]])) {
@@ -255,7 +272,7 @@ setMethod(f = "plot",
               values <- getValues(x@sPG, frequencies = frequencies,
                                   levels.1=levels, levels.2=levels)
               if (ptw.CIs > 0) {
-                CI <- getCIs(x,alpha = ptw.CIs/2)
+                CI <- getCIs(x,alpha = ptw.CIs,method = method)
                 lowerCIs  <- CI$q_low
                 upperCIs  <- CI$q_up
                 #text.headline <- (paste(text.headline, ", includes ",1-ptw.CIs,"-CI (ptw. of type '",type.CIs,"')",sep=""))
@@ -309,7 +326,7 @@ setMethod(f = "plot",
                     switch(type.scaling,
                            "individual" = {
                              y.min <- min(c(Re(allVals[,i1,i2]),lowerCIs[,i2,i1]))
-                             y.max <- max(c(upperCIs[,i1,i2],Re(allVals[,i2,i1])))},
+                             y.max <- max(c(upperCIs[,i2,i1],Re(allVals[,i1,i2])))},
                            "real-imaginary" = {
                              y.min <- min(Re(allVals))
                              y.max <- max(Re(allVals))},
@@ -337,7 +354,7 @@ setMethod(f = "plot",
                     switch(type.scaling,
                            "individual" = {
                              y.min <- min(c(Im(allVals[,i1,i2]),lowerCIs[,i2,i1]))
-                             y.max <- max(c(upperCIs[,i1,i2],Im(allVals[,i2,i1])))},
+                             y.max <- max(c(upperCIs[,i2,i1],Im(allVals[,i1,i2])))},
                            "real-imaginary" = {
                              y.min <- min(Im(allVals))
                              y.max <- max(Im(allVals))},

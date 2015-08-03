@@ -7,7 +7,9 @@ Date: 2015-06-24
 Authors@R: person("Stefan", "Birr", role=c("aut","cre"),email = "stefan.birr@ruhr-uni-bochum.de")
 Depends:
     quantspec,
-    stats4
+    stats4,
+    abind,
+    fGarch
 Description: Provides functionality for Model Validation by computing a
     parametric Bootstrap and comparing the Quantile Spectral densitiys.
 License: GPL (>=2)
