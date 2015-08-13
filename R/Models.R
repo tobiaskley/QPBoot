@@ -99,10 +99,10 @@ getGARCH <- function(){
   estimator <- function(x){
     param = coef(garchFit(formula = ~garch(1,1), include.mean = FALSE,trace = FALSE, data = as.numeric(x)))
     if(param[2] + param[3] < 1){
-      print("Cut Off")
       return(param)
     }else{
       while(param[2] + param[3] >= 1){
+      warning(paste("Estimated parametes do not suffice the stationarity condition. Using a stationary approximation"),sep = "")
       p2 = param[2]
       p3 = param[3]
       param[2] = p2/(p2+p3) - 10^(-3)

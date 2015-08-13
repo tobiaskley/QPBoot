@@ -13,11 +13,3 @@
 #'             the methods to each of the generic.
 #'
 
-
-## Class-QPBoot
-
-#' @name generics-accessors
-#' @aliases getCIs
-#' @export
-setGeneric("getCIs",
-    function(object, ...){standardGeneric("getCIs")})

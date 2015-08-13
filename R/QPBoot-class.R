@@ -4,8 +4,8 @@ NULL
 ################################################################################
 #' Class for a Parametric Bootstrap based on Quantile Spectral Analysis
 #'
-#' \code{QPBoot} is a class to compute und contain the results of a Parametric
-#'Bootstrap based on Quantile Spectral Analysis.
+#' \code{QPBoot} is a class to compute und contain the results of a parametric
+#' bootstrap based on Quantile Spectral Analysis.
 #'
 #'
 #' @name QPBoot-class
@@ -47,26 +47,41 @@ setMethod(
 }
 )
 ################################################################################
-#' Computes the \eqn{\alpha} an \eqn{1-\alpha} quantiles for the simulated Periodograms
-#' and returns those.
+#' @title
+#' Pointwise Confidence Intervalls
+#' 
+#' @description 
+#' Depending on \code{method} this calculates pointwise confidence intervalls for
+#' a smoothed periodgram that belongs to a time series defined by \code{model} and
+#' \code{param}. If \code{(method = "quantiles")} it computes the \eqn{\alpha/2}
+#' and \eqn{1-\alpha/2} quantiles from the Values of the simulated smoothed periodograms and
+#' returns those. If \code{(method = "norm")} it uses the asymptotic normality
+#' of the smoothed periodograms by estimating \code{mean} and 
+#' \code{standard deviation} for each frequency and computing the \eqn{\alpha/2}
+#' and \eqn{1-\alpha/2} quantiles from a normal distribution with the estimated
+#' parameters.
 #'
-#' @name getCIs-QPBoot
-#' @aliases getCIs,QPBoot-method
+#' @return 
+#' Returns a \code{list} with four elements
+#' \item{\code{q_up}}{}
+#' \item{\code{q_low}}{}
+#' \item{\code{mean}}{}
+#' \item{\code{sd}}{}
+#' @name computeCIs-QPBoot
+#' @aliases computeCIs,QPBoot-method
 #' @export
 #'
-#' @keywords Access-functions
+#' 
 #'
 #' @param object
 #' @param alpha
+#' @param method
 #'
 #'
 ################################################################################
-setMethod(f = "getCIs",
-          signature = signature(
-            object = "QPBoot"),
-          definition = function(object,alpha = 0.05,method = c("quantiles","norm")){
+computeCIs <- function(object,alpha = 0.05,method = c("quantiles","norm"),levels = object@sPG@levels[[1]]){
             #Extract Values
-            ln = length(getLevels(object@sPG)[[1]])
+            ln = length(levels)
             freq = getFrequencies(object@sPGsim[[1]])
             fhat = object@sPGsim
             SimNum = length(fhat)
@@ -75,13 +90,14 @@ setMethod(f = "getCIs",
             SimValues = array(rep(0,SimNum*n*ln^2),dim = c(SimNum,n,ln,ln))
             
             for(i in 1:length(fhat)){
+              fhatValues = getValues(fhat[[i]],levels.1 = levels,levels.2 = levels,frequencies = getFrequencies(fhat[[i]]))
             for(ln1 in 1:ln){
               for(ln2 in 1:ln){
                 if (ln1 >= ln2){
-                  SimValues[i,,ln1,ln2] = Re(getValues(fhat[[i]],frequencies = getFrequencies(fhat[[i]]))[,ln1,ln2,1])
+                  SimValues[i,,ln1,ln2] = Re(fhatValues)[,ln1,ln2,1]
                 }
                 else{
-                  SimValues[i,,ln1,ln2] = Im(getValues(fhat[[i]],frequencies = freq)[,ln2,ln1,1])
+                  SimValues[i,,ln1,ln2] = Im(fhatValues)[,ln2,ln1,1]
                 }
               }
             }
@@ -107,17 +123,17 @@ setMethod(f = "getCIs",
             )
             
             #Return:
-            return(list(q_low = q_low,q_up = q_up))
+            return(list(q_low = q_low,q_up = q_up,mean = mean, sd = sd))
           }
-)
 ################################################################################
 #' Create an instance of the \code{QPBoot} class by doing 3 things
 #' \enumerate{
-#'  \item Estimates a parametric \code{model} from a given set of \code{data}
+#'  \item Estimates a parametric \code{model} from a given set of \code{data},
+#'        this estimate can be overwritten by using the parameter \code{trueparam}
 #'  \item Simulates from that \code{model} and computes the smoothed Quantile
 #'        Periodogram (\link[quantspec]{smoothedPG}) for each simulated time
 #'        series and the given \code{data}
-#'  \item returns an object of the class \link{QPBoot} with the calculated
+#'  \item Returns an object of the class \link{QPBoot} with the calculated
 #'        smoothed Periodograms
 #' }
 #'
@@ -133,11 +149,12 @@ setMethod(f = "getCIs",
 #' @param levels
 #' @param weight
 #' @param SimNum
+#' @param trueparam
 #'
 #'
 ################################################################################
 
-qpBoot <- function(data,model = getAR(2),levels = c(.25,.5,.75),weight = kernelWeight(bw = 0.1*length(data)^(-1/5)),SimNum = 1000,trueparam = NULL){
+qpBoot <- function(data,model = getAR(2),levels = c(.1,.5,.9),weight = kernelWeight(bw = 0.1),SimNum = 1000,trueparam = NULL){
 # Set
 ln = length(levels)
 n = length(data)
@@ -272,7 +289,7 @@ setMethod(f = "plot",
               values <- getValues(x@sPG, frequencies = frequencies,
                                   levels.1=levels, levels.2=levels)
               if (ptw.CIs > 0) {
-                CI <- getCIs(x,alpha = ptw.CIs,method = method)
+                CI <- computeCIs(x,alpha = ptw.CIs,method = method,levels = levels)
                 lowerCIs  <- CI$q_low
                 upperCIs  <- CI$q_up
                 #text.headline <- (paste(text.headline, ", includes ",1-ptw.CIs,"-CI (ptw. of type '",type.CIs,"')",sep=""))

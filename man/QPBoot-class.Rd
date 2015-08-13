@@ -6,8 +6,8 @@
 \alias{QPBoot-class}
 \title{Class for a Parametric Bootstrap based on Quantile Spectral Analysis}
 \description{
-\code{QPBoot} is a class to compute und contain the results of a Parametric
-Bootstrap based on Quantile Spectral Analysis.
+\code{QPBoot} is a class to compute und contain the results of a parametric
+bootstrap based on Quantile Spectral Analysis.
 }
 \section{Slots}{
 

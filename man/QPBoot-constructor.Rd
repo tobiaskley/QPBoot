@@ -5,17 +5,17 @@
 \alias{qpBoot}
 \title{Create an instance of the \code{QPBoot} class by doing 3 things
 \enumerate{
- \item Estimates a parametric \code{model} from a given set of \code{data}
+ \item Estimates a parametric \code{model} from a given set of \code{data},
+       this estimate can be overwritten by using the parameter \code{trueparam}
  \item Simulates from that \code{model} and computes the smoothed Quantile
        Periodogram (\link[quantspec]{smoothedPG}) for each simulated time
        series and the given \code{data}
- \item returns an object of the class \link{QPBoot} with the calculated
+ \item Returns an object of the class \link{QPBoot} with the calculated
        smoothed Periodograms
 }}
 \usage{
-qpBoot(data, model = getAR(2), levels = c(0.25, 0.5, 0.75),
-  weight = kernelWeight(bw = 0.1 * length(data)^(-1/5)), SimNum = 1000,
-  trueparam = NULL)
+qpBoot(data, model = getAR(2), levels = c(0.1, 0.5, 0.9),
+  weight = kernelWeight(bw = 0.1), SimNum = 1000, trueparam = NULL)
 }
 \arguments{
 \item{data}{}
@@ -27,15 +27,18 @@ qpBoot(data, model = getAR(2), levels = c(0.25, 0.5, 0.75),
 \item{weight}{}
 
 \item{SimNum}{}
+
+\item{trueparam}{}
 }
 \description{
 Create an instance of the \code{QPBoot} class by doing 3 things
 \enumerate{
- \item Estimates a parametric \code{model} from a given set of \code{data}
+ \item Estimates a parametric \code{model} from a given set of \code{data},
+       this estimate can be overwritten by using the parameter \code{trueparam}
  \item Simulates from that \code{model} and computes the smoothed Quantile
        Periodogram (\link[quantspec]{smoothedPG}) for each simulated time
        series and the given \code{data}
- \item returns an object of the class \link{QPBoot} with the calculated
+ \item Returns an object of the class \link{QPBoot} with the calculated
        smoothed Periodograms
 }
 }
