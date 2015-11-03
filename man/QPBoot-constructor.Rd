@@ -3,38 +3,35 @@
 \name{QPBoot-constructor}
 \alias{QPBoot-constructor}
 \alias{qpBoot}
-\title{Create an instance of the \code{QPBoot} class by doing 3 things
-\enumerate{
- \item Estimates a parametric \code{model} from a given set of \code{data},
-       this estimate can be overwritten by using the parameter \code{trueparam}
- \item Simulates from that \code{model} and computes the smoothed Quantile
-       Periodogram (\link[quantspec]{smoothedPG}) for each simulated time
-       series and the given \code{data}
- \item Returns an object of the class \link{QPBoot} with the calculated
-       smoothed Periodograms
-}}
+\title{qpBoot}
 \usage{
 qpBoot(data, model = getAR(2), levels = c(0.1, 0.5, 0.9),
-  weight = kernelWeight(bw = 0.1), SimNum = 1000, trueparam = NULL)
+  weight = kernelWeight(bw = 0.1), SimNum = 1000, fix.param = NULL)
 }
 \arguments{
-\item{data}{}
+\item{data}{numeric vector, containing the time-series data}
 
-\item{model}{}
+\item{model}{an object from the class \link{tsModel-class}.}
 
-\item{levels}{}
+\item{levels}{numeric vector containing values between 0 and 1 for which the
+\link[quantspec]{smoothedPG}. Will be estimated. These are the
+quantiles levels that are used for the validation}
 
-\item{weight}{}
+\item{weight}{an object of the class \link[quantspec]{KernelWeight} that is used to
+in the estimation of the \link[quantspec]{smoothedPG}.}
 
-\item{SimNum}{}
+\item{SimNum}{number of bootstrap}
 
-\item{trueparam}{}
+\item{fix.param}{defaults to \code{NULL}. In this case the parameters for the simulations are
+                  estimated via the methode defined in the argument \code{model}. If this is not
+                  \code{NULL}, it has to contain a list that can be used to set the parameters
+                  in the \link{tsModel-class}. All simulations are then done with these fixed parameters.}
 }
 \description{
 Create an instance of the \code{QPBoot} class by doing 3 things
 \enumerate{
  \item Estimates a parametric \code{model} from a given set of \code{data},
-       this estimate can be overwritten by using the parameter \code{trueparam}
+       this estimate can be overwritten by using the parameter \code{fix.param}
  \item Simulates from that \code{model} and computes the smoothed Quantile
        Periodogram (\link[quantspec]{smoothedPG}) for each simulated time
        series and the given \code{data}

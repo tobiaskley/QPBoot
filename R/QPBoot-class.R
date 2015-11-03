@@ -1,5 +1,4 @@
-#' @include Models.R
-#' @include generics.R
+#' @include Generics.R
 NULL
 ################################################################################
 #' Class for a Parametric Bootstrap based on Quantile Spectral Analysis
@@ -9,7 +8,7 @@ NULL
 #'
 #'
 #' @name QPBoot-class
-#' @aliases QPBoot
+#' @aliases QPBoot-class
 #' @exportClass QPBoot
 #'
 #' @keywords S4-classes
@@ -17,18 +16,20 @@ NULL
 #' @slot data   the original data where the parametric bootstrap is based upon
 #' @slot sPG    a smoothed quantile Periodogram from the \code{quantspec}-package
 #'              calculatet from \code{data}
-#' @slot model  parametric model for the bootstrap, this is a function that returns a
-#'              simulate function and an estimate function see \link{models}
+#' @slot model  parametric model for the bootstrap from \link{tsModel-class}, some Examples
+#'              can be found in  \link{Models}
 #' @slot param  parameter estimated for the \code{model} from the \code{data}
 #' @slot sPGsim smoothed quantile periodograms of the simulated time series
+#' 
+#' @importFrom methods setMethod
 ################################################################################
 setClass(
   Class = "QPBoot",
   representation=representation(
     sPG = "SmoothedPG",
     data = "numeric",
-    model = "list",
-    param = "numeric",
+    model = "tsModel",
+    param = "list",
     sPGsim = "list"
   )
 )
@@ -70,12 +71,16 @@ setMethod(
 #' @name computeCIs-QPBoot
 #' @aliases computeCIs,QPBoot-method
 #' @export
-#'
+#' 
 #' 
 #'
-#' @param object
-#' @param alpha
-#' @param method
+#' @param object   the \link{QPBoot} object that will be plotted
+#' @param alpha    the significiant level of the confidence intervalls, defaults to \code{0.05}
+#' @param method   either "quantile" or "norm", determines how the confidence intervalls are calculated.
+#'                 see description for details
+#' @param levels   numeric vector containing values between 0 and 1 for which the 
+#'                 \link[quantspec]{smoothedPG}. Will be estimated. These are the
+#'                 quantiles levels that are used for the validation
 #'
 #'
 ################################################################################
@@ -126,10 +131,12 @@ computeCIs <- function(object,alpha = 0.05,method = c("quantiles","norm"),levels
             return(list(q_low = q_low,q_up = q_up,mean = mean, sd = sd))
           }
 ################################################################################
+#' qpBoot
+#' 
 #' Create an instance of the \code{QPBoot} class by doing 3 things
 #' \enumerate{
 #'  \item Estimates a parametric \code{model} from a given set of \code{data},
-#'        this estimate can be overwritten by using the parameter \code{trueparam}
+#'        this estimate can be overwritten by using the parameter \code{fix.param}
 #'  \item Simulates from that \code{model} and computes the smoothed Quantile
 #'        Periodogram (\link[quantspec]{smoothedPG}) for each simulated time
 #'        series and the given \code{data}
@@ -144,17 +151,23 @@ computeCIs <- function(object,alpha = 0.05,method = c("quantiles","norm"),levels
 #'
 #' @keywords Constructors
 #'
-#' @param data
-#' @param model
-#' @param levels
-#' @param weight
-#' @param SimNum
-#' @param trueparam
+#' @param data       numeric vector, containing the time-series data
+#' @param model      an object from the class \link{tsModel-class}. 
+#' @param levels     numeric vector containing values between 0 and 1 for which the 
+#'                   \link[quantspec]{smoothedPG}. Will be estimated. These are the
+#'                   quantiles levels that are used for the validation
+#' @param weight     an object of the class \link[quantspec]{KernelWeight} that is used to
+#'                   in the estimation of the \link[quantspec]{smoothedPG}.
+#' @param SimNum     number of bootstrap 
+#' @param fix.param  defaults to \code{NULL}. In this case the parameters for the simulations are
+#'                   estimated via the methode defined in the argument \code{model}. If this is not
+#'                   \code{NULL}, it has to contain a list that can be used to set the parameters
+#'                   in the \link{tsModel-class}. All simulations are then done with these fixed parameters.
 #'
 #'
 ################################################################################
 
-qpBoot <- function(data,model = getAR(2),levels = c(.1,.5,.9),weight = kernelWeight(bw = 0.1),SimNum = 1000,trueparam = NULL){
+qpBoot <- function(data,model = getAR(2),levels = c(.1,.5,.9),weight = kernelWeight(bw = 0.1),SimNum = 1000,fix.param = NULL){
 # Set
 ln = length(levels)
 n = length(data)
@@ -162,21 +175,22 @@ n = length(data)
 # Compute smoothed Periodogram of the data
 sPG = smoothedPG(data,levels.1 = levels,weight = weight)
 
-# Estimate the parametric model and Simulate from there
-if (is.null(trueparam)){
-param = model$estimator(data)
+# Estimate the parametric model and simulate from there
+if (is.null(fix.param)){
+param = estimate(model,data)
 }else{
-  param = as.numeric(trueparam)
+  param = fix.param
+  setParameter(model,param)
 }
-#param =c(.1,.8,0)  #use true parameter
 
 sPGsim = list()
 S = array(rep(0,SimNum*length(data)),dim = c(SimNum,length(data)))
+
 #Simulate SimNum times
 pb = txtProgressBar()
 for (i in 1:SimNum){
   setTxtProgressBar(pb,i/SimNum)
-  S[i,] = model$simulate(param,length(data))
+  S[i,] = Simulate(model,length(data))
   sPGsim[[i]] = smoothedPG(S[i,],levels.1 = levels,weight = weight)
 }
 close(pb)
@@ -194,23 +208,33 @@ return(obj)
 #' In each of the subplots either the real part (on and below the diagonal;
 #' i. e., \eqn{\tau_1 \leq \tau_2}{tau1 <= tau2}) or the imaginary parts
 #' (above the diagonal; i. e., \eqn{\tau_1 > \tau_2}{tau1 > tau2}) of
-#' \itemize{
-#'   \item the smoothed quantile periodogram (blue line),
-#'   \item pointwise confidence intervals from the parametric bootstrap (light gray area),
+#' \describe{
+#'   \item{}{the smoothed quantile periodogram (blue line)}
+#'   \item{}{pointwise confidence intervals from the parametric bootstrap (light gray area)}
 #' }
 #' for the combination of levels \eqn{\tau_1}{tau1} and \eqn{\tau_2}{tau2}
 #' denoted on the left and bottom margin of the plot are displayed.
+#' The \code{method} argument determines how the confidence intervalls are calculated.
+#'  \describe{
+#'   \item{quantile}{calculates the (1-\eqn{\alpha/2}) and \eqn{\alpha/2} quantiles from the bootstrap} 
+#'   \item{norm}{asymptotic normality of the smoothed Periodograms is used, mean and standard deviation are
+#'                 estimated from the bootstrap}
+#' }
+#' 
 #'
 #' @name plot-QPBoot
 #' @aliases plot,QPBoot,ANY-method
 #' @export
 #'
 #' @importFrom abind abind
+#' 
 #'
 #' @param x  The \code{\link{SmoothedPG}} object to plot
 #' @param ptw.CIs the confidence level for the conspec = garchSpec(model = param)fidence intervals to be
 #'                 displayed; must be a number from [0,1]; if null, then no
 #'                 confidence intervals will be plotted.
+#' @param method either "quantile" or "norm", determines how the confidence intervalls are calculated.
+#'               see description for details
 #' @param ratio quotient of width over height of the subplots; use this
 #'               parameter to produce landscape or portrait shaped plots.
 #' @param widthlab width for the labels (left and bottom); default is
@@ -252,9 +276,6 @@ setMethod(f = "plot",
             }
             if (!hasArg(levels)) {
               levels <- intersect(x@sPG@levels[[1]], x@sPG@levels[[2]])
-            }
-            if (!hasArg(plotPG)) {
-              plotPG <- FALSE
             }
             if (!hasArg(ptw.CIs)) {
               ptw.CIs <- 0.1
@@ -298,12 +319,6 @@ setMethod(f = "plot",
               X <- frequencies/(2*pi)
               
               allVals <- array(values[,,,1], dim=c(length(X), K, K))
-              if (plotPG)  {
-                allVals <- abind(allVals, array(PG[,,,1], dim=c(length(X), K, K)), along=1)
-              }
-              if (hasArg(qsd)) {
-                allVals <- abind(allVals, csd, along=1)
-              }
               if (ptw.CIs > 0) {
                 allVals <- abind(allVals, lowerCIs, upperCIs, along=1)
               }
@@ -358,12 +373,6 @@ setMethod(f = "plot",
                       polygon(x=c(X,rev(X)), y=c(Re(lowerCIs[,i2,i1]),rev(Re(upperCIs[,i2,i1]))),
                               col="lightgray", border=NA)
                     }
-                    if (plotPG) {
-                      lines(x=X, y=Re(PG[,i1,i2,1]), col=gray(0.5))
-                    }
-                    if (hasArg(qsd)) {
-                      lines(x=freq.csd/(2*pi), y=Re(csd[,i1,i2]), col="red")
-                    }
                     lines(x=X, y=Re(values[,i1,i2,1]),
                           ylim=c(min(Re(allVals)), max(Re(allVals))),
                           type="l", col="blue")
@@ -384,12 +393,6 @@ setMethod(f = "plot",
                     if (ptw.CIs > 0) {
                       polygon(x=c(X,rev(X)), y=c((lowerCIs[,i2,i1]),rev((upperCIs[,i2,i1]))),
                               col="lightgray", border=NA)
-                    }
-                    if (plotPG) {
-                      lines(x=X, y=Im(PG[,i1,i2,1]), col=gray(0.5))
-                    }
-                    if (hasArg(qsd)) {
-                      lines(x=freq.csd/(2*pi), y=Im(csd[,i1,i2]), col="red")
                     }
                     lines(x=X, y=Im(values[,i1,i2,1]),
                           ylim=c(min(Im(allVals)), max(Im(allVals))),

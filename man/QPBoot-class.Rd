@@ -2,7 +2,6 @@
 % Please edit documentation in R/QPBoot-class.R
 \docType{class}
 \name{QPBoot-class}
-\alias{QPBoot}
 \alias{QPBoot-class}
 \title{Class for a Parametric Bootstrap based on Quantile Spectral Analysis}
 \description{
@@ -17,8 +16,8 @@ bootstrap based on Quantile Spectral Analysis.
 \item{\code{sPG}}{a smoothed quantile Periodogram from the \code{quantspec}-package
 calculatet from \code{data}}
 
-\item{\code{model}}{parametric model for the bootstrap, this is a function that returns a
-simulate function and an estimate function see \link{models}}
+\item{\code{model}}{parametric model for the bootstrap from \link{tsModel-class}, some Examples
+can be found in  \link{Models}}
 
 \item{\code{param}}{parameter estimated for the \code{model} from the \code{data}}
 

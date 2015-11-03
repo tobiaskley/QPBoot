@@ -1,283 +1,126 @@
 NULL
-
+#' @include tsModel-class.R
+#' 
 ################################################################################
-#' ARMA time series of order p,q
+#' @title Predefined Time-Series Models
 #' 
-#' Returns two functions \code{estimate(x)} und \code{simulate(param,n)} and a string
-#' that contains the name of the model and its parameters.
+#' @description  Creates a \link{tsModel-class} object representing a time-series model
 #' 
-#' \enumerate{
-#' \item \code{estimate(x)} estimates the parameters of the \code{ARMA(p,q)} Model by using
-#' the \code{\link[stats]{arima}} function
-#' }
-#' @name getARMA
-#' @aliases ARMApq
+#'   
+#' @param spec a list specifying the structure of the parameters of the model
+#' 
+#' @name Models
+#' @aliases ARMA
 #' @export
 #'
-#' @param p numeric sets the order of the AR part
-#' @param q numeric sets the order of the MA part
 #'
 ################################################################################
-getARMA <- function(p,q){
-  # Yule-Walker estimator
-  estimator <- function(x){
-    est = arima(x,order = c(p,0,q),include.mean = FALSE)
-    return(coef(est))
-  }
-  # for simulation
-  simulate <- function(param,n){
-   arima.sim(list(ar = param[1:p],ma= param[(p+1):(p+q)]),n = n,rand.gen = rnorm)}
+getARMA <- function(spec = list(ar.order=NA,ma.order=NA)){
   
-  return(list(estimator = estimator, simulate = simulate, name = paste("ARMA(",p,q,")",sep = "")))
-}
-
-
-################################################################################
-#' Autoregressive time series of order p
-#'
-#' @name getAR
-#' @aliases ARp
-#' @export
-#'
-#' @param p numeric sets the order of the AR(p) process
-#'
-#' @examples
-#' model = getAR(2)
-################################################################################
-getAR <- function(p){
-p = p
-# Yule-Walker estimator
-estimator <- function(x){
-  ar(x,aic = FALSE,order.max = p)$ar
-}
-# for simulation
-simulate <- function(param,n){
-  arima.sim(list(ar = param),n,rand.gen = rnorm)
-}
-
-return(list(estimator = estimator, simulate = simulate, name = paste("AR(",p,")",sep = "")) )
-}
-
-################################################################################
-#' Moving-Averages time series of order q
-#'
-#' @name getMA
-#' @aliases MAq
-#' @export
-#'
-#' @param q numeric sets the order of the MA(q) process
-#'
-#' @examples
-#' model = getMA(2)
-################################################################################
-getMA <- function(q){
-
-  # ML estimator
-  estimator <- function(x){
-    coef(arima(x,order = c(0,0,q),include.mean = FALSE))
+  arma = new("tsModel",spec = spec,name = paste("ARMA","(",spec$ar.order,",",spec$ma.order,")",sep = ""))
+  
+  
+  # Yule-Walker estimator
+  estimate <- function(data,spec){
+    est = arima(data,order = c((spec$ar.order),0,(spec$ma.order)),include.mean = FALSE)
+    #return(list(as.numeric(coef(est))))
+    return(list(ar = as.numeric(coef(est))[1:spec$ar.order],ma = as.numeric(coef(est))[(spec$ar.order+1):(spec$ar.order+spec$ma.order)]))
   }
   # for simulation
-  simulate <- function(param,n){
-    arima.sim(list(ma = param),n,rand.gen = rnorm)
-  }
+  Simulate <- function(n,spec,par){
+   arima.sim(list(order = c(spec$ar.order,0,spec$ma.order),ar = par$ar,ma=par$ma),n = n,rand.gen = rnorm)}
+  
+  setEstimate(arma,estimate)
+  setSimulate(arma,Simulate)
+ return(arma)
+}
 
-  return(list(estimator = estimator, simulate = simulate, name = paste("MA(",q,")",sep = "")) )
+
+################################################################################
+#' @name Models
+#' @aliases AR
+#' @export
+#'
+################################################################################
+getAR <- function(spec = list(ar.order = 1)){
+ ar = getARMA(spec = list(ar.order = spec$ar.order, ma.order = 0))
+ ar@name = paste("AR","(",spec$ar.order,")",sep = "")
+ return(ar)
 }
 
 ################################################################################
-#' GARCH process of order (1,1)
-#' 
-#' @name getGARCH
+#' @name Models
+#' @aliases MA
+#' @export
+#'
+################################################################################
+getMA <- function(spec = list(ma.order = 1)){
+  ma = getARMA(spec = list(ma.order = spec$ma.order, ar.order = 0))
+  ma@name = paste("MA","(",spec$ma.order,")",sep = "")
+  return(ar)
+}
+################################################################################
+#' @name Models
 #' @aliases GARCH
 #' @export
 #'
-#'
 ################################################################################
-getGARCH <- function(){
-
-  # ML estimator
-  estimator <- function(x){
-    param = coef(garchFit(formula = ~garch(1,1), include.mean = FALSE,trace = FALSE, data = as.numeric(x)))
-    if(param[2] + param[3] < 1){
-      return(param)
-    }else{
-      while(param[2] + param[3] >= 1){
-      warning(paste("Estimated parametes do not suffice the stationarity condition. Using a stationary approximation"),sep = "")
-      p2 = param[2]
-      p3 = param[3]
-      param[2] = p2/(p2+p3) - 10^(-3)
-      param[3] = p3/(p2+p3) - 10^(-3)
-      }
-      return(param)
+getGARCH <- function(spec = list(alpha = 1,beta = 1)){
+  
+  garch = new("tsModel",name = paste("GARCH","(",spec$alpha,",",spec$beta,")",sep = ""),spec = spec) 
+  
+  # QML estimator
+  estimate <- function(data,spec){
+    
+    gspec = ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(spec$alpha,spec$beta)), mean.model = 
+                                              list(armaOrder = c(0,0),include.mean = FALSE))
+    fit = ugarchfit(gspec,data)
+    par = as.numeric(coef(fit))
+    return(list(mu = par[1],alpha = par[2],beta = par[3]))
     }
-  }
+  
   # for simulation
-  simulate <- function(param,n){
-    spec = garchSpec(model = list(omega = param[1],alpha = param[2],beta = param[3]))
-    as.ts(garchSim(spec = spec,n = n))
+  Simulate <- function(n,spec,par){
+    gspec = ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(spec$alpha,spec$beta)), mean.model = 
+                         list(armaOrder = c(0,0),include.mean = FALSE))
+    setfixed(gspec) = list(omega = par$mu,alpha1 = par$alpha,beta1 = par$beta)
+    gpath = ugarchpath(spec = gspec,n.sim = n)
+    return(as.numeric(rugarch::fitted(gpath)))
   }
-
-  return(list(estimator = estimator, simulate = simulate, name = paste("GARCH(1,1)",sep = "")) )
+  setEstimate(garch,estimate)
+  setSimulate(garch,Simulate)
+  return(garch)
 }
 
 ################################################################################
-#' EGARCH process of order (1,1)
-#' 
-#' @name getEGARCH
+#' @name Models
 #' @aliases EGARCH
 #' @export
-#'
-#'
 ################################################################################
-getEGARCH <- function(){
+getEGARCH <- function(spec = list(alpha = 1,beta = 1)){
   
-  # ML estimator
-  estimator <- function(x){
-    j = median(which(egarch_data == x,arr.ind = TRUE)[,2])
-    return(egarch_param[,j])
-    }
+  
+  garch = new("tsModel",name = paste("EGARCH","(",spec$alpha,",",spec$beta,")",sep = ""),spec = spec) 
+  
+  # QML estimator
+  estimate <- function(data,spec){
+    
+    gspec = ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(spec$alpha,spec$beta)), mean.model = 
+                         list(armaOrder = c(0,0),include.mean = FALSE))
+    fit = ugarchfit(gspec,data)
+    par = as.numeric(coef(fit))
+    return(list(mu = par[1],alpha = par[2],beta = par[3],gamma = par[4]))
+  }
+  
   # for simulation
-  simulate <- function(param,n){
-    Y <- rep(0,n+500)
-    sig <- rep(0,n+500)
-    Z = rnorm(n+500)
-    Y[1] = Z[1]
-    sig[1] = 0
-    for(t in 2:(n+500)){
-      sig[t] = param[1] + param[2]*abs(Z[t-1]) +  param[4]*Z[t-1] + param[3]*sig[t-1]
-      Y[t] = exp(sig[t]/2)*Z[t]
-    }
-    return(Y[501:(n+500)])
-     
+  Simulate <- function(n,spec,par){
+    gspec = ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(spec$alpha,spec$beta)), mean.model = 
+                         list(armaOrder = c(0,0),include.mean = FALSE))
+    setfixed(gspec) = list(omega = par$mu,alpha1 = par$alpha,beta1 = par$beta,gamma1 = par$gamma)
+    gpath = ugarchpath(spec = gspec,n.sim = n)
+    return(as.numeric(fitted(gpath)))
   }
-  
-  return(list(estimator = estimator, simulate = simulate, name = paste("EGARCH(1,1)",sep = "")) )
-}
-################################################################################
-#' AGARCH process of order (1,1)
-#' 
-#' @name getAGARCH
-#' @aliases AGARCH
-#' @export
-#'
-#'
-################################################################################
-getAGARCH <- function(){
-  
-  # ML estimator
-  estimator <- function(x){
-    
-  }
-  # for simulation
-  simulate <- function(param,n){
-    Y <- rep(0,n+500)
-    sig <- rep(0,n+500)
-    Z = rnorm(n+500)
-    Y[1] = Z[1]
-    sig[1] = 0
-    for(t in 2:(n+500)){
-      sig[t] = param[1] + param[2]*(abs(Y[t-1]) -  param[4]*Y[t-1])^2 + param[3]*sig[t-1]
-      Y[t] = sqrt(sig[t])*Z[t]
-    }
-    return(Y[501:(n+500)])
-    
-  }
-  
-  return(list(estimator = estimator, simulate = simulate, name = paste("AGARCH(1,1)",sep = "")) )
-}
-################################################################################
-#' GJR process of order (1,1)
-#' 
-#' @name getGJR
-#' @aliases GJR
-#' @export
-#'
-#'
-################################################################################
-getGJR <- function(){
-  
-  # ML estimator
-  estimator <- function(x){
-    
-  }
-  # for simulation
-  simulate <- function(param,n){
-    Y <- rep(0,n+500)
-    sig <- rep(0,n+500)
-    Z = rnorm(n+500)
-    Y[1] = Z[1]
-    sig[1] = 0
-    for(t in 2:(n+500)){
-      sig[t] = param[1] + param[2]*(Y[t-1])^2 +  param[4]*(Y[t-1] < 0)*(Y[t-1])^2 + param[3]*sig[t-1]
-      Y[t] = sqrt(sig[t])*Z[t]
-    }
-    return(Y[501:(n+500)])
-    
-  }
-  
-  return(list(estimator = estimator, simulate = simulate, name = paste("GJR(1,1)",sep = "")) )
-}
-################################################################################
-#' TGARCH process of order (1,1)
-#' 
-#' @name getTGARCH
-#' @aliases TGARCH
-#' @export
-#'
-#'
-################################################################################
-getTGARCH <- function(){
-  
-  # ML estimator
-  estimator <- function(x){
-    
-  }
-  # for simulation
-  simulate <- function(param,n){
-    Y <- rep(0,n+500)
-    sig <- rep(0,n+500)
-    Z = rnorm(n+500)
-    Y[1] = Z[1]
-    sig[1] = 0
-    for(t in 2:(n+500)){
-      sig[t] = param[1] + param[2]*max(Y[t-1],0) +  param[3]*max(-Y[t-1],0) + param[4]*sig[t-1]
-      Y[t] = sig[t]*Z[t]
-    }
-    return(Y[501:(n+500)])
-    
-  }
-  
-  return(list(estimator = estimator, simulate = simulate, name = paste("TGARCH(1,1,1)",sep = "")) )
-}
-################################################################################
-#' MGARCH process of order (1,1)
-#' 
-#' @name getMGARCH
-#' @aliases MGARCH
-#' @export
-#'
-#'
-################################################################################
-getMGARCH <- function(){
-  
-  # ML estimator
-  estimator <- function(x){
-    
-  }
-  # for simulation
-  simulate <- function(param,n){
-    Y <- rep(0,n+500)
-    sig <- rep(0,n+500)
-    Z = rnorm(n+500)
-    Y[1] = Z[1]
-    sig[1] = 0
-    for(t in 2:(n+500)){
-      sig[t] = param[1] + param[2]*Y[t-1]^2 + param[3]*sig[t-1]
-      Y[t] = param[4]*sqrt(sig[t]) + sqrt(sig[t])*Z[t]
-    }
-    return(Y[501:(n+500)])
-    
-  }
-  
-  return(list(estimator = estimator, simulate = simulate, name = paste("TGARCH(1,1,1)",sep = "")) )
+  setEstimate(garch,estimate)
+  setSimulate(garch,Simulate)
+  return(garch)
 }

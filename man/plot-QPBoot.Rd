@@ -19,6 +19,9 @@
 displayed; must be a number from [0,1]; if null, then no
 confidence intervals will be plotted.}
 
+\item{method}{either "quantile" or "norm", determines how the confidence intervalls are calculated.
+see description for details}
+
 \item{ratio}{quotient of width over height of the subplots; use this
 parameter to produce landscape or portrait shaped plots.}
 
@@ -58,11 +61,17 @@ be displayed.
 In each of the subplots either the real part (on and below the diagonal;
 i. e., \eqn{\tau_1 \leq \tau_2}{tau1 <= tau2}) or the imaginary parts
 (above the diagonal; i. e., \eqn{\tau_1 > \tau_2}{tau1 > tau2}) of
-\itemize{
-  \item the smoothed quantile periodogram (blue line),
-  \item pointwise confidence intervals from the parametric bootstrap (light gray area),
+\describe{
+  \item{}{the smoothed quantile periodogram (blue line)}
+  \item{}{pointwise confidence intervals from the parametric bootstrap (light gray area)}
 }
 for the combination of levels \eqn{\tau_1}{tau1} and \eqn{\tau_2}{tau2}
 denoted on the left and bottom margin of the plot are displayed.
+The \code{method} argument determines how the confidence intervalls are calculated.
+ \describe{
+  \item{quantile}{calculates the (1-\eqn{\alpha/2}) and \eqn{\alpha/2} quantiles from the bootstrap}
+  \item{norm}{asymptotic normality of the smoothed Periodograms is used, mean and standard deviation are
+                estimated from the bootstrap}
+}
 }
 

@@ -14,3 +14,6 @@ NULL
 #'
 #' @import quantspec
 #' @import stats4
+#' @import graphics
+#' @import rugarch
+NULL

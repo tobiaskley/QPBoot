@@ -14,7 +14,7 @@ rtn = log(dax[2:length(dax)]) - log(dax[1:(length(dax)-1)])
 plot(rtn, type = "l")
 
 # Try to fit a GARCH(1,1) Model to the data (this may take some minutes)
-garch = getGARCH()
+garch = getGARCH(spec = list(alpha = 1,beta = 1))
 levels = c(.1,.5,.9)
 bw = 0.1
 qpB <- qpBoot(rtn, model = garch, levels = levels, weight = kernelWeight(bw = bw), SimNum = 1000)

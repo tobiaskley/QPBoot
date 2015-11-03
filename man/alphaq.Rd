@@ -2,8 +2,7 @@
 % Please edit documentation in R/aux-functions.R
 \name{alphaq}
 \alias{alphaq}
-\title{Returns a function to retrieve the \eqn{\alpha}-quantile from a vector. To be used in
-conjunction with apply.}
+\title{Returns a function to retrieve the \eqn{\alpha}-quantile from a vector.}
 \usage{
 alphaq(a)
 }
@@ -15,7 +14,7 @@ Returns a function that takes an argument \code{x} and calculates the
         \eqn{\alpha}-quantile from the vector \code{x}.
 }
 \description{
-Returns a function to retrieve the \eqn{\alpha}-quantile from a vector. To be used in
+To be used in
 conjunction with apply.
 }
 \examples{

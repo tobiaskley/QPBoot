@@ -2,21 +2,27 @@ Package: QPBoot
 Type: Package
 Title: Model Validation using Quantile Spectral Analysis and Parametric
     Bootstrap
-Version: 0.1
-Date: 2015-06-24
+Version: 0.2
+Date: 2015-10-21
 Authors@R: person("Stefan", "Birr", role=c("aut","cre"),email = "stefan.birr@ruhr-uni-bochum.de")
 Depends:
-    quantspec,
+    R (>= 3.0.0),
+    quantspec
+Imports:
+    methods,
+    graphics,
     stats4,
     abind,
-    fGarch
+    rugarch
 Description: Provides functionality for Model Validation by computing a
     parametric Bootstrap and comparing the Quantile Spectral densitiys.
 License: GPL (>=2)
 LazyData: TRUE
 Collate:
+    'Generics.R'
+    'aux-functions.R'
+    'tsModel-class.R'
     'Models.R'
-    'generics.R'
     'QPBoot-class.R'
     'QPBoot-package.R'
-    'aux-functions.R'
+    'data.R'
