@@ -20,6 +20,6 @@ Returns a numeric vector of length \code{n}, that contains data, simulated accor
 \description{
 \code{Simulate} produces a numeric vector of length \code{n} with data simulated according to
 the \code{sim_function} defined in the \link{tsModel-class}. To use this function the \code{par} slot
-has to be set, either by calling \link{estimate} or directly via \link{setParameter}.
+has to be set, either by calling \link{Estimate} or directly via \link{setParameter}.
 }
 

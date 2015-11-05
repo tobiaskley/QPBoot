@@ -18,7 +18,7 @@ Nothing, it sets the \code{par} slot of the \link{tsModel-class}.
 }
 \description{
 This can be used to set the \code{par} slot of a \link{tsModel-class} by hand, in contrast
-to call \link{estimate} on a given data set. The parameter should be a list with the
+to call \link{Estimate} on a given data set. The parameter should be a list with the
 name an the values of the parameters to be set. See the example below.
 }
 

@@ -14,9 +14,9 @@
 ## Class-tsModel
 
 #' @name generics-accessors
-#' @aliases estimate
+#' @aliases Estimate
 #' @export
-setGeneric("estimate", function(object, ...){standardGeneric("estimate")})
+setGeneric("Estimate", function(object, ...){standardGeneric("Estimate")})
 
 #' @name generics-accessors
 #' @aliases Simulate

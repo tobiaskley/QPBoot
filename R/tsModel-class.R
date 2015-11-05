@@ -68,8 +68,8 @@ setMethod(
 #' @return 
 #' Returns the estimated parameters \code{par} and sets the \code{par} slot of the \link{tsModel-class}.
 #' 
-#' @name estimate-tsModel
-#' @aliases estimate,tsModel-method
+#' @name Estimate-tsModel
+#' @aliases Estimate,tsModel-method
 #' @export
 #'
 #' 
@@ -80,7 +80,7 @@ setMethod(
 #'
 ################################################################################
 setMethod(
-  f = "estimate",
+  f = "Estimate",
   signature = signature("tsModel"),
   definition = function(object,data){
     if(class(object@env$est_function)=="function"){
@@ -99,8 +99,8 @@ setMethod(
 #' Sets the estimation Method of a \link{tsModel-class}
 #' 
 #' @description 
-#' Defines the method that should be used when calling \link{estimate} on the \link{tsModel-class}.
-#' The \code{estimate} function must have exactly the following two arguments: \code{data} (numeric vector) and 
+#' Defines the method that should be used when calling \link{Estimate} on the \link{tsModel-class}.
+#' The \code{Estimate} function must have exactly the following two arguments: \code{data} (numeric vector) and 
 #' \code{spec} (a list) and return a list containing the estimated parameters.
 #'
 #' @return 
@@ -143,7 +143,7 @@ setMethod(
 #' @description 
 #' \code{Simulate} produces a numeric vector of length \code{n} with data simulated according to
 #' the \code{sim_function} defined in the \link{tsModel-class}. To use this function the \code{par} slot
-#' has to be set, either by calling \link{estimate} or directly via \link{setParameter}.
+#' has to be set, either by calling \link{Estimate} or directly via \link{setParameter}.
 #'
 #' @return 
 #' Returns a numeric vector of length \code{n}, that contains data, simulated according to the slot 
@@ -230,7 +230,7 @@ setMethod(
 #' 
 #' @description 
 #' This can be used to set the \code{par} slot of a \link{tsModel-class} by hand, in contrast
-#' to call \link{estimate} on a given data set. The parameter should be a list with the
+#' to call \link{Estimate} on a given data set. The parameter should be a list with the
 #' name an the values of the parameters to be set. See the example below.
 #'
 #' @return 

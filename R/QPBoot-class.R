@@ -177,7 +177,7 @@ sPG = smoothedPG(data,levels.1 = levels,weight = weight)
 
 # Estimate the parametric model and simulate from there
 if (is.null(fix.param)){
-param = estimate(model,data)
+param = Estimate(model,data)
 }else{
   param = fix.param
   setParameter(model,param)

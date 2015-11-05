@@ -17,7 +17,7 @@ plot(rtn, type = "l")
 garch = getGARCH(spec = list(alpha = 1,beta = 1))
 levels = c(.1,.5,.9)
 bw = 0.1
-qpB <- qpBoot(rtn, model = garch, levels = levels, weight = kernelWeight(bw = bw), SimNum = 1000)
+qpB <- qpBoot(rtn, model = garch, levels = levels, weight = kernelWeight(bw = bw), SimNum = 100)
 
 # Plot confidence intervalls using quantiles from the parametric bootstrap
 plot(qpB, ptw.CIs = 0.1, method = "quantiles")

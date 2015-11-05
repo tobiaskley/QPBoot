@@ -18,8 +18,8 @@
 Sets the \code{est_function} slot of the \link{tsModel-class}.
 }
 \description{
-Defines the method that should be used when calling \link{estimate} on the \link{tsModel-class}.
-The \code{estimate} function must have exactly the following two arguments: \code{data} (numeric vector) and
+Defines the method that should be used when calling \link{Estimate} on the \link{tsModel-class}.
+The \code{Estimate} function must have exactly the following two arguments: \code{data} (numeric vector) and
 \code{spec} (a list) and return a list containing the estimated parameters.
 }
 
