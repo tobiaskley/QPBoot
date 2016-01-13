@@ -19,13 +19,13 @@
 #' @slot env An environment to allow for slots which need to be
 #'           accessable in a call-by-reference manner:
 #'       \describe{
-#'         \item{\code{est_function}}{A function implementing an estimator for the
+#'         \item{\code{est_function}}{a function implementing an estimator for the
 #'         parameters of the model. It has the argumens \code{object} and \code{data} and 
 #'         returns the estimated parameter. Also it sets \code{par} to the estimated value.}
-#'         \item{\code{sim_function}}{A function implementing a way to simulate from the
+#'         \item{\code{sim_function}}{a function implementing a way to simulate from the
 #'         the model. It has the argumens \code{object} and \code{n}. Note that \code{par}
 #'         has to be set in order to simulate.}
-#'         \item{\code{par}}{A \code{list} that contains the parameters of the model. Can be
+#'         \item{\code{par}}{a numeric vector that contains the parameters of the model. Can be
 #'         empty at the beginning.}
 #'          }
 ################################################################################
@@ -253,7 +253,7 @@ setMethod(
   f = "setParameter",
   signature = signature("tsModel"),
   definition = function(object,par){
-    if(!(class(par)=="list")){
+    if(!(class(par)=="numeric")){
       par = as.list(par)
     } 
     object@env$par = par

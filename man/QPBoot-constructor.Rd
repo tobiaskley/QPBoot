@@ -5,8 +5,9 @@
 \alias{qpBoot}
 \title{qpBoot}
 \usage{
-qpBoot(data, model = getAR(2), levels = c(0.1, 0.5, 0.9),
-  weight = kernelWeight(bw = 0.1), SimNum = 1000, fix.param = NULL)
+qpBoot(data, model = getAR(2), levels = c(0.1, 0.5, 0.9), frequencies = 2
+  * pi/length(data) * 0:(length(data) - 1), weight = kernelWeight(bw = 0.1),
+  SimNum = 1000, fix.param = NULL)
 }
 \arguments{
 \item{data}{numeric vector, containing the time-series data}
@@ -17,15 +18,17 @@ qpBoot(data, model = getAR(2), levels = c(0.1, 0.5, 0.9),
 \link[quantspec]{smoothedPG}. Will be estimated. These are the
 quantiles levels that are used for the validation}
 
+\item{frequencies}{a vector containing frequencies at which to determine the smoothed periodogram.}
+
 \item{weight}{an object of the class \link[quantspec]{KernelWeight} that is used to
 in the estimation of the \link[quantspec]{smoothedPG}.}
 
 \item{SimNum}{number of bootstrap}
 
 \item{fix.param}{defaults to \code{NULL}. In this case the parameters for the simulations are
-                  estimated via the methode defined in the argument \code{model}. If this is not
-                  \code{NULL}, it has to contain a list that can be used to set the parameters
-                  in the \link{tsModel-class}. All simulations are then done with these fixed parameters.}
+                    estimated via the methode defined in the argument \code{model}. If this is not
+                    \code{NULL}, it has to contain a list that can be used to set the parameters
+                    in the \link{tsModel-class}. All simulations are then done with these fixed parameters.}
 }
 \description{
 Create an instance of the \code{QPBoot} class by doing 3 things

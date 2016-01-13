@@ -29,7 +29,7 @@ setClass(
     sPG = "SmoothedPG",
     data = "numeric",
     model = "tsModel",
-    param = "list",
+    param = "numeric",
     sPGsim = "list"
   )
 )
@@ -124,13 +124,16 @@ computeCIs <- function(object,alpha = 0.05,method = c("quantiles","norm"),levels
                      sd  = apply(SimValues,c(2,3,4),sd)
                      q_low = qnorm(alpha/2,mean = mean, sd = sd)
                      q_up = qnorm(1-alpha/2,mean = mean, sd = sd)
+                   },
+                   "multi-norm" = {
+                     
                    }
             )
             
             #Return:
             return(list(q_low = q_low,q_up = q_up,mean = mean, sd = sd))
           }
-################################################################################
+####################################################################################################################
 #' qpBoot
 #' 
 #' Create an instance of the \code{QPBoot} class by doing 3 things
@@ -151,33 +154,37 @@ computeCIs <- function(object,alpha = 0.05,method = c("quantiles","norm"),levels
 #'
 #' @keywords Constructors
 #'
-#' @param data       numeric vector, containing the time-series data
-#' @param model      an object from the class \link{tsModel-class}. 
-#' @param levels     numeric vector containing values between 0 and 1 for which the 
-#'                   \link[quantspec]{smoothedPG}. Will be estimated. These are the
-#'                   quantiles levels that are used for the validation
-#' @param weight     an object of the class \link[quantspec]{KernelWeight} that is used to
-#'                   in the estimation of the \link[quantspec]{smoothedPG}.
-#' @param SimNum     number of bootstrap 
-#' @param fix.param  defaults to \code{NULL}. In this case the parameters for the simulations are
-#'                   estimated via the methode defined in the argument \code{model}. If this is not
-#'                   \code{NULL}, it has to contain a list that can be used to set the parameters
-#'                   in the \link{tsModel-class}. All simulations are then done with these fixed parameters.
+#' @param data         numeric vector, containing the time-series data
+#' @param model        an object from the class \link{tsModel-class}. 
+#' @param levels       numeric vector containing values between 0 and 1 for which the 
+#'                     \link[quantspec]{smoothedPG}. Will be estimated. These are the
+#'                     quantiles levels that are used for the validation
+#' @param frequencies  a vector containing frequencies at which to determine the smoothed periodogram.
+#' @param weight       an object of the class \link[quantspec]{KernelWeight} that is used to
+#'                     in the estimation of the \link[quantspec]{smoothedPG}.
+#' @param SimNum       number of bootstrap 
+#' @param fix.param    defaults to \code{NULL}. In this case the parameters for the simulations are
+#'                     estimated via the methode defined in the argument \code{model}. If this is not
+#'                     \code{NULL}, it has to contain a list that can be used to set the parameters
+#'                     in the \link{tsModel-class}. All simulations are then done with these fixed parameters.
 #'
 #'
-################################################################################
+####################################################################################################################
 
-qpBoot <- function(data,model = getAR(2),levels = c(.1,.5,.9),weight = kernelWeight(bw = 0.1),SimNum = 1000,fix.param = NULL){
+qpBoot <- function(data,model = getAR(2),levels = c(.1,.5,.9),frequencies = 2 * pi/length(data) * 0:(length(data) -
+                                                                                                         1), weight = kernelWeight(bw = 0.1),SimNum = 1000,fix.param = NULL){
 # Set
 ln = length(levels)
 n = length(data)
 
 # Compute smoothed Periodogram of the data
-sPG = smoothedPG(data,levels.1 = levels,weight = weight)
+sPG = smoothedPG(data,levels.1 = levels,weight = weight,frequencies = frequencies)
 
 # Estimate the parametric model and simulate from there
 if (is.null(fix.param)){
 param = Estimate(model,data)
+print("Estimated Parameter:")
+print(param)
 }else{
   param = fix.param
   setParameter(model,param)
@@ -191,7 +198,7 @@ pb = txtProgressBar()
 for (i in 1:SimNum){
   setTxtProgressBar(pb,i/SimNum)
   S[i,] = Simulate(model,length(data))
-  sPGsim[[i]] = smoothedPG(S[i,],levels.1 = levels,weight = weight)
+  sPGsim[[i]] = smoothedPG(S[i,],levels.1 = levels,weight = weight,frequencies = frequencies)
 }
 close(pb)
 obj <- new("QPBoot",as.numeric(data),sPG,model,sPGsim,param)

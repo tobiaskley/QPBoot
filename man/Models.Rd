@@ -3,12 +3,14 @@
 \name{Models}
 \alias{AR}
 \alias{ARMA}
+\alias{ARMA_GARCH}
 \alias{EGARCH}
 \alias{GARCH}
 \alias{MA}
 \alias{Models}
 \alias{getAR}
 \alias{getARMA}
+\alias{getARMA_GARCH}
 \alias{getEGARCH}
 \alias{getGARCH}
 \alias{getMA}
@@ -23,6 +25,8 @@ getMA(spec = list(ma.order = 1))
 getGARCH(spec = list(alpha = 1, beta = 1))
 
 getEGARCH(spec = list(alpha = 1, beta = 1))
+
+getARMA_GARCH(spec = list(ar = 1, ma = 1, alpha = 1, beta = 1))
 }
 \arguments{
 \item{spec}{a list specifying the structure of the parameters of the model}
