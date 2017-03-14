@@ -68,6 +68,25 @@ getMA <- function(spec = list(ma.order = 1)){
 }
 ################################################################################
 #' @name Models
+#' @aliases Noise
+#' @export
+#'
+################################################################################
+getNoise <- function(){
+  noise = new("tsModel",name = "noise",spec = list()) 
+estimate <- function(data,spec=list()){
+  return(c(mean(data),var(data)))
+}
+simulate <- function(n,spec = list(),par){
+  return(sqrt(par[2])*rnorm(n) + par[1])
+  
+}
+setSimulate(noise,simulate)
+setEstimate(noise,estimate)
+return(noise)
+}
+################################################################################
+#' @name Models
 #' @aliases GARCH
 #' @export
 #'
@@ -91,6 +110,39 @@ getGARCH <- function(spec = list(alpha = 1,beta = 1)){
     fixed.pars = par
     gspec = rugarch::ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(spec$alpha,spec$beta)), mean.model = 
                          list(armaOrder = c(0,0),include.mean = FALSE),fixed.par = fixed.pars)
+    # setfixed(gspec) = par
+    gpath = rugarch::ugarchpath(spec = gspec,n.sim = n)
+    return(as.numeric(rugarch::fitted(gpath)))
+  }
+  setEstimate(garch,estimate)
+  setSimulate(garch,Simulate)
+  return(garch)
+}
+################################################################################
+#' @name Models
+#' @aliases fGARCH
+#' @export
+#'
+################################################################################
+getARCH <- function(spec = list(alpha = 1)){
+  
+  garch = new("tsModel",name = paste("ARCH","(",spec$alpha,")",sep = ""),spec = spec) 
+  
+  # QML estimator
+  estimate <- function(data,spec){
+    
+    gspec = rugarch::ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(spec$alpha,0)), mean.model = 
+                                  list(armaOrder = c(0,0),include.mean = FALSE))
+    fit = rugarch::ugarchfit(gspec,data)
+    par = coef(fit)
+    return(par)
+  }
+  
+  # for simulation
+  Simulate <- function(n,spec,par){
+    fixed.pars = par
+    gspec = rugarch::ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(spec$alpha,0)), mean.model = 
+                                  list(armaOrder = c(0,0),include.mean = FALSE),fixed.par = fixed.pars)
     # setfixed(gspec) = par
     gpath = rugarch::ugarchpath(spec = gspec,n.sim = n)
     return(as.numeric(rugarch::fitted(gpath)))
