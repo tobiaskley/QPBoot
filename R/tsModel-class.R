@@ -1,4 +1,4 @@
-#' @include Generics.R
+#' @include generic-accessors.R
 #' @include aux-functions.R
 ################################################################################
 #' @title Class for a Parametric Time-Series Model
