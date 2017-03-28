@@ -9,8 +9,6 @@ Depends:
     R (>= 3.0.0),
     quantspec
 Imports:
- stats,
- utils,
     methods,
     graphics,
     stats4,
@@ -21,11 +19,10 @@ Description: Provides functionality for Model Validation by computing a
 License: GPL (>=2)
 LazyData: TRUE
 Collate:
+    'Generics.R'
     'aux-functions.R'
-    'generic-accessors.R'
     'tsModel-class.R'
     'Models.R'
     'QPBoot-class.R'
     'QPBoot-package.R'
     'data.R'
-RoxygenNote: 5.0.1

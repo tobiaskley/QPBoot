@@ -4,7 +4,7 @@
 #' These generic functions are needed to access or set the objects' attributes.
 #'
 #' @name generics-accessors
-#' @description Defines generic function names for the package QPBoot
+#'
 #' @param object object from which to get the value
 #' @param ... optional parameters; for documentation see the documentation of
 #'             the methods to each of the generic.
