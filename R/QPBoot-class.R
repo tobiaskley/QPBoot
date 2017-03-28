@@ -171,7 +171,7 @@ computeCIs <- function(object,alpha = 0.05,method = c("quantiles","norm"),levels
 #'
 ####################################################################################################################
 
-qpBoot <- function(data,model = getAR(2),levels = c(.1,.5,.9),frequencies = 2 * pi/length(data) * 0:(length(data) -
+qpBoot <- function(data,model = getARMA(list(ar.order = 2,ma.order =0)),levels = c(.1,.5,.9),frequencies = 2 * pi/length(data) * 0:(length(data) -
                                                                                                          1), weight = kernelWeight(bw = 0.1),SimNum = 1000,fix.param = NULL){
 # Set
 ln = length(levels)

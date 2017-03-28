@@ -5,9 +5,10 @@
 \alias{qpBoot}
 \title{qpBoot}
 \usage{
-qpBoot(data, model = getAR(2), levels = c(0.1, 0.5, 0.9), frequencies = 2
-  * pi/length(data) * 0:(length(data) - 1), weight = kernelWeight(bw = 0.1),
-  SimNum = 1000, fix.param = NULL)
+qpBoot(data, model = getARMA(list(ar.order = 2, ma.order = 0)),
+  levels = c(0.1, 0.5, 0.9), frequencies = 2 * pi/length(data) *
+  0:(length(data) - 1), weight = kernelWeight(bw = 0.1), SimNum = 1000,
+  fix.param = NULL)
 }
 \arguments{
 \item{data}{numeric vector, containing the time-series data}
