@@ -1,4 +1,4 @@
-#' @include Generics.R
+#' @include generic-accessors.R
 NULL
 ################################################################################
 #' Class for a Parametric Bootstrap based on Quantile Spectral Analysis
