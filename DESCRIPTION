@@ -3,17 +3,17 @@ Type: Package
 Title: Model Validation using Quantile Spectral Analysis and Parametric
     Bootstrap
 Version: 0.2
-Date: 2015-10-21
+Date: 2017-05-15
 Authors@R: person("Stefan", "Birr", role=c("aut","cre"),email = "stefan.birr@ruhr-uni-bochum.de")
+Author: Stefan Birr [aut, cre]
+Maintainer: Stefan Birr <stefan.birr@ruhr-uni-bochum.de>
 Depends:
     R (>= 3.0.0),
     quantspec
 Imports:
- stats,
+ stats4,
  utils,
     methods,
-    graphics,
-    stats4,
     abind,
     rugarch
 Description: Provides functionality for Model Validation by computing a
@@ -28,4 +28,4 @@ Collate:
     'QPBoot-class.R'
     'QPBoot-package.R'
     'data.R'
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

@@ -19,4 +19,3 @@ Quandl
 \url{https://www.quandl.com/data/YAHOO/INDEX_GDAXI-DAX-Index-Germany}
 }
 \keyword{data}
-

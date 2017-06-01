@@ -17,4 +17,3 @@ a vector of characters containing the names of the arguments of the function \co
 \description{
 To check if an estimate or simulate function is valid.
 }
-

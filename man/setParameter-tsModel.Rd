@@ -2,8 +2,8 @@
 % Please edit documentation in R/tsModel-class.R
 \docType{methods}
 \name{setParameter-tsModel}
-\alias{setParameter,tsModel-method}
 \alias{setParameter-tsModel}
+\alias{setParameter,tsModel-method}
 \title{Sets the Parameter of a \link{tsModel-class} manually}
 \usage{
 \S4method{setParameter}{tsModel}(object, par)
@@ -21,4 +21,3 @@ This can be used to set the \code{par} slot of a \link{tsModel-class} by hand, i
 to call \link{Estimate} on a given data set. The parameter should be a list with the
 name an the values of the parameters to be set. See the example below.
 }
-

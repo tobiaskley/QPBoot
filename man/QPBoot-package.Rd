@@ -2,8 +2,8 @@
 % Please edit documentation in R/QPBoot-package.R
 \docType{package}
 \name{QPBoot-package}
-\alias{QPBoot}
 \alias{QPBoot-package}
+\alias{QPBoot}
 \title{Quantile Spectral Analysis for Parametric Bootstrap}
 \description{
 Methods to validate model assumptions by using Quantile Spectral Analysis and
@@ -12,4 +12,3 @@ Paramtric Bootstraps
 \author{
 Stefan Birr
 }
-

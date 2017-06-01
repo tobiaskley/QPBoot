@@ -26,7 +26,6 @@ exportMethods(plot)
 exportMethods(setEstimate)
 exportMethods(setParameter)
 exportMethods(setSimulate)
-import(graphics)
 import(quantspec)
 import(rugarch)
 import(stats4)
@@ -36,3 +35,6 @@ importFrom("methods", "hasArg", "new")
   importFrom("stats", "ar", "arima", "arima.sim", "qnorm", "rnorm",
              "var")
   importFrom("utils", "setTxtProgressBar", "txtProgressBar")
+  importFrom("graphics", "layout", "lcm", "lines", "par", "plot.new",
+             "polygon", "text")
+

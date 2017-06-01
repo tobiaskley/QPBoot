@@ -44,4 +44,3 @@ Create an instance of the \code{QPBoot} class by doing 3 things
 }
 }
 \keyword{Constructors}
-

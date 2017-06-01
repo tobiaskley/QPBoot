@@ -23,5 +23,5 @@ can be found in  \link{Models}}
 
 \item{\code{sPGsim}}{smoothed quantile periodograms of the simulated time series}
 }}
-\keyword{S4-classes}
 
+\keyword{S4-classes}

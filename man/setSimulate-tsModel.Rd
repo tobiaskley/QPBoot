@@ -2,8 +2,8 @@
 % Please edit documentation in R/tsModel-class.R
 \docType{methods}
 \name{setSimulate-tsModel}
-\alias{setSimulate,tsModel-method}
 \alias{setSimulate-tsModel}
+\alias{setSimulate,tsModel-method}
 \title{Sets the simulation Method of a \link{tsModel-class}}
 \usage{
 \S4method{setSimulate}{tsModel}(object, Simulate)
@@ -23,4 +23,3 @@ The passed \code{Simulate} function must have exactly the following three argume
 \code{spec} (a list) and \code{par} (another list). It returns a numeric vector with the 
 simulated data.
 }
-

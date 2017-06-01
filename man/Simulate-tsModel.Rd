@@ -2,8 +2,8 @@
 % Please edit documentation in R/tsModel-class.R
 \docType{methods}
 \name{Simulate-tsModel}
-\alias{Simulate,tsModel-method}
 \alias{Simulate-tsModel}
+\alias{Simulate,tsModel-method}
 \title{Simulates from a \link{tsModel-class}}
 \usage{
 \S4method{Simulate}{tsModel}(object, n)
@@ -22,4 +22,3 @@ Returns a numeric vector of length \code{n}, that contains data, simulated accor
 the \code{sim_function} defined in the \link{tsModel-class}. To use this function the \code{par} slot
 has to be set, either by calling \link{Estimate} or directly via \link{setParameter}.
 }
-

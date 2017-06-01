@@ -2,8 +2,8 @@
 % Please edit documentation in R/tsModel-class.R
 \docType{methods}
 \name{setEstimate-tsModel}
-\alias{setEstimate,tsModel-method}
 \alias{setEstimate-tsModel}
+\alias{setEstimate,tsModel-method}
 \title{Sets the estimation Method of a \link{tsModel-class}}
 \usage{
 \S4method{setEstimate}{tsModel}(object, estimate)
@@ -22,4 +22,3 @@ Defines the method that should be used when calling \link{Estimate} on the \link
 The \code{Estimate} function must have exactly the following two arguments: \code{data} (numeric vector) and 
 \code{spec} (a list) and return a list containing the estimated parameters.
 }
-

@@ -2,8 +2,8 @@
 % Please edit documentation in R/tsModel-class.R
 \docType{methods}
 \name{Estimate-tsModel}
-\alias{Estimate,tsModel-method}
 \alias{Estimate-tsModel}
+\alias{Estimate,tsModel-method}
 \title{Estimates the parameter of a \link{tsModel-class}}
 \usage{
 \S4method{Estimate}{tsModel}(object, data)
@@ -20,4 +20,3 @@ Returns the estimated parameters \code{par} and sets the \code{par} slot of the 
 The methods estimates the parameters from the time-series in \code{data}, using the method
 defined in the \link{tsModel-class}.
 }
-

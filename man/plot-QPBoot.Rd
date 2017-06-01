@@ -2,8 +2,8 @@
 % Please edit documentation in R/QPBoot-class.R
 \docType{methods}
 \name{plot-QPBoot}
-\alias{plot,QPBoot,ANY-method}
 \alias{plot-QPBoot}
+\alias{plot,QPBoot,ANY-method}
 \title{Plot the values of a \code{\link{QPBoot}}.}
 \usage{
 \S4method{plot}{QPBoot,ANY}(x, ptw.CIs = 0.1, method = "quantiles",
@@ -74,4 +74,3 @@ The \code{method} argument determines how the confidence intervalls are calculat
                 estimated from the bootstrap}
 }
 }
-

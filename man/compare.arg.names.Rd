@@ -19,4 +19,3 @@ Logical if the names of the arguments are identical to \code{names}
 \description{
 To check if an estimate or simulate function is valid.
 }
-

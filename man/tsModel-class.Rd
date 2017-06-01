@@ -2,8 +2,8 @@
 % Please edit documentation in R/tsModel-class.R
 \docType{class}
 \name{tsModel-class}
-\alias{tsModel}
 \alias{tsModel-class}
+\alias{tsModel}
 \title{Class for a Parametric Time-Series Model}
 \description{
 \code{tsModel} is a class to contain parametric time-series models (like ARMA
@@ -30,5 +30,5 @@
   empty at the beginning.}
    }}
 }}
-\keyword{S4-classes}
 
+\keyword{S4-classes}
