@@ -7,6 +7,7 @@
 \title{Pointwise Confidence Intervalls}
 \usage{
 computeCIs(object, alpha = 0.05, method = c("quantiles", "norm"),
+  freq = getFrequencies(object@sPGsim[[1]]),
   levels = object@sPG@levels[[1]])
 }
 \arguments{
@@ -16,6 +17,8 @@ computeCIs(object, alpha = 0.05, method = c("quantiles", "norm"),
 
 \item{method}{either "quantile" or "norm", determines how the confidence intervalls are calculated.
 see description for details}
+
+\item{freq}{a vector of frequencies for which to compute the CIs}
 
 \item{levels}{numeric vector containing values between 0 and 1 for which the 
 \link[quantspec]{smoothedPG}. Will be estimated. These are the

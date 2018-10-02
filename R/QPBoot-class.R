@@ -78,13 +78,17 @@ setMethod(
 #' @param alpha    the significiant level of the confidence intervalls, defaults to \code{0.05}
 #' @param method   either "quantile" or "norm", determines how the confidence intervalls are calculated.
 #'                 see description for details
+#' @param freq a vector of frequencies for which to compute the CIs
 #' @param levels   numeric vector containing values between 0 and 1 for which the 
 #'                 \link[quantspec]{smoothedPG}. Will be estimated. These are the
 #'                 quantiles levels that are used for the validation
 #'
 #'
 ################################################################################
-computeCIs <- function(object,alpha = 0.05,method = c("quantiles","norm"),levels = object@sPG@levels[[1]]){
+computeCIs <- function(object, alpha = 0.05, method = c("quantiles", "norm"),
+                       freq = getFrequencies(object@sPGsim[[1]]),
+                       levels = object@sPG@levels[[1]]){
+                     
             #Extract Values
             ln = length(levels)
             freq = getFrequencies(object@sPGsim[[1]])
