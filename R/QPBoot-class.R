@@ -91,7 +91,6 @@ computeCIs <- function(object, alpha = 0.05, method = c("quantiles", "norm"),
                      
             #Extract Values
             ln = length(levels)
-            freq = getFrequencies(object@sPGsim[[1]])
             fhat = object@sPGsim
             SimNum = length(fhat)
             n = length(freq)
@@ -99,7 +98,7 @@ computeCIs <- function(object, alpha = 0.05, method = c("quantiles", "norm"),
             SimValues = array(rep(0,SimNum*n*ln^2),dim = c(SimNum,n,ln,ln))
             
             for(i in 1:length(fhat)){
-              fhatValues = getValues(fhat[[i]],levels.1 = levels,levels.2 = levels,frequencies = getFrequencies(fhat[[i]]))
+              fhatValues = getValues(fhat[[i]],levels.1 = levels,levels.2 = levels,frequencies = freq)
             for(ln1 in 1:ln){
               for(ln2 in 1:ln){
                 if (ln1 >= ln2){
