@@ -61,6 +61,7 @@ setMethod(
 #' \code{standard deviation} for each frequency and computing the \eqn{\alpha/2}
 #' and \eqn{1-\alpha/2} quantiles from a normal distribution with the estimated
 #' parameters.
+#' If \code{(method = "uniform-wrt-taus")} then [TODO: explain the procedure].
 #'
 #' @return 
 #' Returns a \code{list} with four elements
@@ -75,8 +76,10 @@ setMethod(
 #' 
 #'
 #' @param object   the \link{QPBoot} object that will be plotted
-#' @param alpha    the significiant level of the confidence intervalls, defaults to \code{0.05}
-#' @param method   either "quantile" or "norm", determines how the confidence intervalls are calculated.
+#' @param alpha    the significiant level of the confidence intervalls, defaults
+#' 								 to \code{0.05}
+#' @param method   either "quantile" or "norm" or "uniform-wrt-taus",
+#' 								 determines how the confidence intervalls are calculated.
 #'                 see description for details
 #' @param freq a vector of frequencies for which to compute the CIs
 #' @param levels   numeric vector containing values between 0 and 1 for which the 
@@ -85,7 +88,8 @@ setMethod(
 #'
 #'
 ################################################################################
-computeCIs <- function(object, alpha = 0.05, method = c("quantiles", "norm"),
+computeCIs <- function(object, alpha = 0.05,
+                       method = c("quantiles", "norm", "uniform-wrt-taus"),
                        freq = getFrequencies(object@sPGsim[[1]]),
                        levels = object@sPG@levels[[1]]){
                      
@@ -99,16 +103,16 @@ computeCIs <- function(object, alpha = 0.05, method = c("quantiles", "norm"),
             
             for(i in 1:length(fhat)){
               fhatValues = getValues(fhat[[i]],levels.1 = levels,levels.2 = levels,frequencies = freq)
-            for(ln1 in 1:ln){
-              for(ln2 in 1:ln){
-                if (ln1 >= ln2){
-                  SimValues[i,,ln1,ln2] = Re(fhatValues)[,ln1,ln2,1]
-                }
-                else{
-                  SimValues[i,,ln1,ln2] = Im(fhatValues)[,ln2,ln1,1]
+              for(ln1 in 1:ln){
+                for(ln2 in 1:ln){
+                  if (ln1 >= ln2){
+                    SimValues[i,,ln1,ln2] = Re(fhatValues)[,ln1,ln2,1]
+                  }
+                  else{
+                    SimValues[i,,ln1,ln2] = Im(fhatValues)[,ln2,ln1,1]
+                  }
                 }
               }
-            }
             }
 
             method <- match.arg(method)[1]
@@ -129,6 +133,64 @@ computeCIs <- function(object, alpha = 0.05, method = c("quantiles", "norm"),
                      q_up = qnorm(1-alpha/2,mean = mean, sd = sd)
                    },
                    "multi-norm" = {
+                     
+                   },
+                   "uniform-wrt-taus" = {
+                     # compute mean over bootstrap replications
+                     fbar <- apply(SimValues, c(2, 3, 4), mean)
+                     # replicate SimNum times
+                     fbar <- array(fbar, dim = c(dim(fbar), SimNum) )
+                     fbar <- aperm(fbar, c(4, 1, 2, 3) )
+                     
+                     dif <- abs(SimValues - fbar)
+                     
+                     # define an array to scale the difference with
+                     var_fak <- array(dim = c(ln, ln))
+                     for(ln1 in 1:ln){
+                       for(ln2 in 1:ln){
+                         var_fak[ln1, ln2] <- min(levels[ln1], levels[ln1]) -
+                                              levels[ln1] * levels[ln1]
+                       }
+                     }
+                     var_fak <- array(var_fak, c(dim(var_fak), SimNum, n))
+                     var_fak <- aperm(var_fak, c(3, 4, 1, 2))
+                     
+                     # two separate versions with only the Re or Im part
+                     Re_dif <- dif
+                     Im_dif <- dif
+                     for (i in 2:ln) {
+                       # block out the other part
+                       Re_dif[ , , i-1, i:ln] <- 0
+                       Im_dif[ , , i:ln, i] <- 0
+                     }
+                     Im_dif[ , , 1:ln, 1] <- 0
+                     
+                     max_Re_dif <- apply(Re_dif / var_fak, c(1, 2), max)
+                     max_Im_dif <- apply(Im_dif / var_fak, c(1, 2), max)
+                     
+                     max_Re_dif <- apply(max_Re_dif, c(2), quantile,
+                                               prob = 1-alpha/2)
+                     max_Im_dif <- apply(max_Im_dif, c(2), quantile,
+                                             prob = 1-alpha/2)
+                     max_dif <- array(dim = c(n, ln, ln))
+                     for (ln1 in 1:ln) {
+                       for (ln2 in 1:ln) {
+                         if (ln1 >= ln2) {
+                           max_dif[ , ln1, ln2] <- max_Re_dif
+                         } else {
+                           max_dif[ , ln1, ln2] <- max_Im_dif
+                         }
+                         
+                       }
+                     }
+                     
+                     q_low = rep(0, length(freq))
+                     q_up = rep(0, length(freq))
+                     
+                     q_low = fbar[1,,,,drop=TRUE] -
+                             var_fak[1,,,,drop=TRUE] * max_dif
+                     q_up = fbar[1,,,,drop=TRUE] +
+                         var_fak[1,,,,drop=TRUE] * max_dif
                      
                    }
             )

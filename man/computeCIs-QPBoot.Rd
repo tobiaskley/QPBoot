@@ -6,16 +6,18 @@
 \alias{computeCIs,QPBoot-method}
 \title{Pointwise Confidence Intervalls}
 \usage{
-computeCIs(object, alpha = 0.05, method = c("quantiles", "norm"),
-  freq = getFrequencies(object@sPGsim[[1]]),
+computeCIs(object, alpha = 0.05, method = c("quantiles", "norm",
+  "uniform-wrt-taus"), freq = getFrequencies(object@sPGsim[[1]]),
   levels = object@sPG@levels[[1]])
 }
 \arguments{
 \item{object}{the \link{QPBoot} object that will be plotted}
 
-\item{alpha}{the significiant level of the confidence intervalls, defaults to \code{0.05}}
+\item{alpha}{the significiant level of the confidence intervalls, defaults
+to \code{0.05}}
 
-\item{method}{either "quantile" or "norm", determines how the confidence intervalls are calculated.
+\item{method}{either "quantile" or "norm" or "uniform-wrt-taus",
+                 determines how the confidence intervalls are calculated.
 see description for details}
 
 \item{freq}{a vector of frequencies for which to compute the CIs}
@@ -41,4 +43,5 @@ of the smoothed periodograms by estimating \code{mean} and
 \code{standard deviation} for each frequency and computing the \eqn{\alpha/2}
 and \eqn{1-\alpha/2} quantiles from a normal distribution with the estimated
 parameters.
+If \code{(method = "uniform-wrt-taus")} then [TODO: explain the procedure].
 }
