@@ -148,8 +148,8 @@ computeCIs <- function(object, alpha = 0.05,
                      var_fak <- array(dim = c(ln, ln))
                      for(ln1 in 1:ln){
                        for(ln2 in 1:ln){
-                         var_fak[ln1, ln2] <- min(levels[ln1], levels[ln1]) -
-                                              levels[ln1] * levels[ln1]
+                         var_fak[ln1, ln2] <- min(levels[ln1], levels[ln2]) -
+                                              levels[ln1] * levels[ln2]
                        }
                      }
                      var_fak <- array(var_fak, c(dim(var_fak), SimNum, n))
