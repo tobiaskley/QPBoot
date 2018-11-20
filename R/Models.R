@@ -100,7 +100,7 @@ getGARCH <- function(spec = list(alpha = 1,beta = 1)){
     
     gspec = rugarch::ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(spec$alpha,spec$beta)), mean.model = 
                                               list(armaOrder = c(0,0),include.mean = FALSE))
-    fit = rugarch::ugarchfit(gspec,data)
+    fit = rugarch::ugarchfit(gspec,data,solver="hybrid")
     par = coef(fit)
     return(par)
     }
@@ -133,7 +133,7 @@ getARCH <- function(spec = list(alpha = 1)){
     
     gspec = rugarch::ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(spec$alpha,0)), mean.model = 
                                   list(armaOrder = c(0,0),include.mean = FALSE))
-    fit = rugarch::ugarchfit(gspec,data)
+    fit = rugarch::ugarchfit(gspec,data,solver="hybrid")
     par = coef(fit)
     return(par)
   }
@@ -167,7 +167,7 @@ getEGARCH <- function(spec = list(alpha = 1,beta = 1)){
     
     gspec = ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(spec$alpha,spec$beta)), mean.model = 
                          list(armaOrder = c(0,0),include.mean = FALSE))
-    fit = ugarchfit(gspec,data)
+    fit = ugarchfit(gspec,data,solver="hybrid")
     par = coef(fit)
     return(par)
   }
