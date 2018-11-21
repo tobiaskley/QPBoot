@@ -119,11 +119,10 @@ computeCIs <- function(object, alpha = 0.05,
             switch(method,
                    "quantiles" = {
                      #Compute Quantiles
-                     q_low = rep(0,length(freq))
-                     q_up = rep(0,length(freq))
-                     
-                     q_low = apply(SimValues,c(2,3,4),alphaq(alpha/2))
-                     q_up = apply(SimValues,c(2,3,4),alphaq(1-alpha/2))
+                     aux <- apply(SimValues,c(2,3,4),quantile,
+                              probs=c(1-alpha/2,alpha/2))
+                     q_low <- aux[2,,,]
+                     q_up  <- aux[1,,,]
                      },
                    "norm" = {
                      #Estimate mean and variance
