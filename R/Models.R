@@ -91,25 +91,38 @@ return(noise)
 #' @export
 #'
 ################################################################################
-getGARCH <- function(spec = list(alpha = 1,beta = 1)){
+getGARCH <- function(spec = list(alpha = 1, beta = 1, distr.model = "norm")){
   
-  garch = new("tsModel",name = paste("GARCH","(",spec$alpha,",",spec$beta,")",sep = ""),spec = spec) 
+  garch = new("tsModel",
+              name = paste("GARCH","(",spec$alpha,",",
+                                       spec$beta,",",
+                                       spec$distr.model,")",sep = ""),
+              spec = spec) 
   
   # QML estimator
-  estimate <- function(data,spec){
+  estimate <- function(data, spec){
     
-    gspec = rugarch::ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(spec$alpha,spec$beta)), mean.model = 
-                                              list(armaOrder = c(0,0),include.mean = FALSE))
-    fit = rugarch::ugarchfit(gspec,data,solver="hybrid")
+    gspec = rugarch::ugarchspec(
+        variance.model = list(model = "sGARCH",
+                              garchOrder = c(spec$alpha,spec$beta)),
+        mean.model = list(armaOrder = c(0,0),
+                          include.mean = FALSE),
+        distribution.model = spec$distr.model)
+    fit = rugarch::ugarchfit(gspec, data, solver = "hybrid")
     par = coef(fit)
     return(par)
     }
   
   # for simulation
-  Simulate <- function(n,spec,par){
+  Simulate <- function(n, spec, par){
     fixed.pars = par
-    gspec = rugarch::ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(spec$alpha,spec$beta)), mean.model = 
-                         list(armaOrder = c(0,0),include.mean = FALSE),fixed.par = fixed.pars)
+    gspec = rugarch::ugarchspec(
+        variance.model = list(model = "sGARCH",
+                              garchOrder = c(spec$alpha,spec$beta)),
+        mean.model = list(armaOrder = c(0,0),
+                          include.mean = FALSE),
+        distribution.model = spec$distr.model,
+        fixed.par = fixed.pars)
     # setfixed(gspec) = par
     gpath = rugarch::ugarchpath(spec = gspec,n.sim = n)
     return(as.numeric(rugarch::fitted(gpath)))
@@ -157,31 +170,43 @@ getARCH <- function(spec = list(alpha = 1)){
 #' @aliases EGARCH
 #' @export
 ################################################################################
-getEGARCH <- function(spec = list(alpha = 1,beta = 1)){
+getEGARCH <- function(spec = list(alpha = 1, beta = 1, distr.model = "norm")){
   
   
-  garch = new("tsModel",name = paste("EGARCH","(",spec$alpha,",",spec$beta,")",sep = ""),spec = spec) 
+  garch = new("tsModel",
+              name = paste("EGARCH","(",spec$alpha,",",
+                                        spec$beta,")",
+                                        spec$distr.model, sep = ""),
+              spec = spec) 
   
   # QML estimator
   estimate <- function(data,spec){
     
-    gspec = ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(spec$alpha,spec$beta)), mean.model = 
-                         list(armaOrder = c(0,0),include.mean = FALSE))
-    fit = ugarchfit(gspec,data,solver="hybrid")
+    gspec = ugarchspec(
+        variance.model = list(model = "eGARCH",
+                              garchOrder = c(spec$alpha,spec$beta)),
+        mean.model = list(armaOrder = c(0,0), include.mean = FALSE),
+        distribution.model = spec$distr.model)
+    fit = ugarchfit(gspec, data, solver = "hybrid")
     par = coef(fit)
     return(par)
   }
   
   # for simulation
-  Simulate <- function(n,spec,par){
-    gspec = ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(spec$alpha,spec$beta)), mean.model = 
-                         list(armaOrder = c(0,0),include.mean = FALSE))
-    setfixed(gspec) = par
-    gpath = ugarchpath(spec = gspec,n.sim = n)
+  Simulate <- function(n, spec, par){
+    fixed.pars = par
+    gspec = ugarchspec(
+        variance.model = list(model = "eGARCH",
+                              garchOrder = c(spec$alpha, spec$beta)),
+        mean.model = list(armaOrder = c(0,0), include.mean = FALSE),
+        distribution.model = spec$distr.model,
+        fixed.par = fixed.pars)
+    #setfixed(gspec) = par
+    gpath = ugarchpath(spec = gspec, n.sim = n)
     return(as.numeric(fitted(gpath)))
   }
-  setEstimate(garch,estimate)
-  setSimulate(garch,Simulate)
+  setEstimate(garch, estimate)
+  setSimulate(garch, Simulate)
   return(garch)
 }
 
